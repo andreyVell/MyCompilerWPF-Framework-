@@ -5,8 +5,46 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MyCompilerWPF_Framework_"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Pascal compiler"
+        Height="600" 
+        Width="800"
+        SizeChanged="Size_Changed"
+        KeyDown="TextBox_KeyDown"
+        Icon="./Resources\mainicon.ico">
+
     <Grid>
-        
+        <Menu Height="21" VerticalAlignment="Top" FontSize="15">
+            <MenuItem Header="File">
+                <MenuItem Header="Open" ></MenuItem>
+                <MenuItem Header="Save" ></MenuItem>
+                <MenuItem Header="Save as" ></MenuItem>
+                <Separator />
+                <MenuItem Header="Exit" ></MenuItem>
+            </MenuItem>
+            <MenuItem Header="Run" Click="Run_Click" ToolTip="F5 | Начать отладку" >
+                <MenuItem.Icon>
+                    <Image Source="./Resources\run.png"></Image>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem Header="View">
+                <MenuItem Header="Zoom in" Click="ZoomIn_Click" StaysOpenOnClick="True"></MenuItem>
+                <MenuItem Header="Zoom out" Click="ZoomOut_Click" StaysOpenOnClick="True"></MenuItem>
+            </MenuItem>
+        </Menu>
+        <Label Content="Program:" HorizontalAlignment="Left" Margin="0,26,0,0" VerticalAlignment="Top" />
+        <TextBox x:Name="textBoxInput" 
+                 VerticalScrollBarVisibility="Visible"
+                 AcceptsReturn="True" 
+                 Margin="10,60,10,260" 
+                 Text="" 
+                 TextWrapping="Wrap"/>
+        <TextBox x:Name="textBoxOutput" 
+                 VerticalScrollBarVisibility="Visible"
+                 AcceptsReturn="True"                 
+                 Margin="10,345,10,5" 
+                 IsReadOnly="True"
+                 Text=""      
+                 TextWrapping="Wrap"/>
+        <Label x:Name ="labelResult" Content="Output:" HorizontalAlignment="Left" Margin="10,320,0,0" VerticalAlignment="Top" Height="27"/>
     </Grid>
 </Window>

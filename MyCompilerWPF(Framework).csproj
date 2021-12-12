@@ -63,12 +63,19 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="CError.cs" />
+    <Compile Include="CInputOutputModule.cs" />
+    <Compile Include="CLexicalAnalyzer.cs" />
+    <Compile Include="CSyntacticalAnalyzer.cs" />
+    <Compile Include="CToken.cs" />
+    <Compile Include="CType.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PascalCompiler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -94,8 +101,10 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Resources\" />
+    <Resource Include="Resources\mainicon.ico" />
+    <Resource Include="Resources\run.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
