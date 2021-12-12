@@ -63,6 +63,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="CCodeGeneration.cs" />
     <Compile Include="CError.cs" />
     <Compile Include="CInputOutputModule.cs" />
     <Compile Include="CLexicalAnalyzer.cs" />
