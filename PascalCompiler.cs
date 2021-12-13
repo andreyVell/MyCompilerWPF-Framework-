@@ -1,8 +1,4 @@
 ﻿using System;
-using System.IO;
-//using System.Windows;
-//using System.Threading.Tasks;
-//using System.Reflection.Emit;
 
 namespace MyCompilerWPF_Framework_
 {

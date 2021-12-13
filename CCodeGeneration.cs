@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Reflection;
 using System.Threading;
 using System.Reflection.Emit;
 using System.IO;
-using System.Windows;
 
 namespace MyCompilerWPF_Framework_
 {
