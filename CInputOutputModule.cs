@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 
 namespace MyCompilerWPF_Framework_
@@ -10,12 +11,14 @@ namespace MyCompilerWPF_Framework_
         private ushort curLinePos;
         private ushort curCharPos;
         private string[] parsedInput;
-        public CInputOutputModule(string code)
+        private string path;
+        public CInputOutputModule(string code,string savePath)
         {
             parsedInput = code.Split('\n');
             curLinePos = 0;
             curCharPos = 0;
             errorList = new List<CError>();
+            path = savePath;
     }
         public char GetNextLetter()
         {
@@ -42,9 +45,13 @@ namespace MyCompilerWPF_Framework_
         {
             string errorsOut=string.Empty;
             if (errorList.Count > 0)
-                errorsOut+="Find some errors!\n\n";
-            else
-                errorsOut += "Done, without errors!\n";
+            {
+                errorsOut += "Find some errors!\n\n";
+                if (File.Exists(path))
+                    File.Delete(path);
+            }
+            else                            
+                errorsOut += "Done, without errors!\n" + path + '\n';
             if (errorList.Count > 0)
                 for (int i = 0; i < parsedInput.Length; i++)
                 {

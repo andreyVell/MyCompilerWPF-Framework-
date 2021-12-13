@@ -37,7 +37,8 @@ namespace MyCompilerWPF_Framework_
         {
             textBoxOutput.Text = string.Empty;
             PascalCompiler compiler = new PascalCompiler();
-            compiler.Compilate(textBoxInput.Text);
+            string dll_with_il_code_outputPath = @"E:\Универ\7 трим\Формальные грамматики и методы трансляции\Compiller C#\PascalToIlCode.dll";
+            compiler.Compilate(textBoxInput.Text, dll_with_il_code_outputPath);
             textBoxOutput.Text = compiler.GetResult();
         }
         private void TextBox_KeyDown(object sender, KeyEventArgs e)

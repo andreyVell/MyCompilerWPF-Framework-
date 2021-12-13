@@ -11,13 +11,17 @@ namespace MyCompilerWPF_Framework_
         private CType identType;
         private CInputOutputModule ioModule;
         private CLexicalAnalyzer lexer;
+        private CCodeGeneration generator;
         private CToken curToken = null;
-        bool needToNextToken = true;
-        bool needToAcceptToken = true;
-        public CSyntacticalAnalyzer(CInputOutputModule io, CLexicalAnalyzer lex)
+        private bool needToNextToken = true;
+        private bool needToAcceptToken = true;
+        private string path;
+        public CSyntacticalAnalyzer(CInputOutputModule io, CLexicalAnalyzer lex,string savePath)
         {
             ioModule = io;
             lexer = lex;
+            generator = new CCodeGeneration();
+            path = savePath;
         }
         private bool Accept(CToken expectedToken)
         {
@@ -162,7 +166,8 @@ namespace MyCompilerWPF_Framework_
             Name();
             Accept(new CToken(EOperator.semicolonsy));
             Block();
-            Accept(new CToken(EOperator.pointsy));            
+            Accept(new CToken(EOperator.pointsy));
+            generator.Save(path);
             throw new Exception(ioModule.errorOutput());
         }
         private void Name() //<имя>
@@ -172,7 +177,8 @@ namespace MyCompilerWPF_Framework_
         private void Block() //<блок>
         {
             VariableSection();
-            OperatorsSection();
+            generator.GenerateMSIL(identTable);
+            OperatorsSection();            
         }
         private void VariableSection() //<раздел переменных>
         {
@@ -305,10 +311,13 @@ namespace MyCompilerWPF_Framework_
         }
         private void AssignOperator()// <оператор присваивания>
         {
+            CToken tempTokenForGeneration;
             CType left, right;
             left = Variable();
+            tempTokenForGeneration = curToken;
             Accept(new CToken(EOperator.assignsy));
             right = Expression();
+            generator.GenerateMSILAssign(tempTokenForGeneration);
             if (left != null && right != null)
                 if (!left.AssignTo(right))
                     ioModule.error($"It's impossible to assign a ({right.ToString()}) value to an ({left.ToString()}) variable");
@@ -337,12 +346,15 @@ namespace MyCompilerWPF_Framework_
         private CType Expression()// <выражение> (возвращает null в случае синтаксич ошибки)
         {
             CType left, right;
+            EOperator operation;
             left = SimpleExpression();
             GetNextTokenManualy();
             if (curToken==(new CToken(EOperator.equalsy)) || curToken == (new CToken(EOperator.latergreatersy)) || curToken == (new CToken(EOperator.latersy)) || curToken == (new CToken(EOperator.laterequalsy)) || curToken == (new CToken(EOperator.greaterequalsy)) || curToken == (new CToken(EOperator.greatersy)))
             {                
                 RelationshipOperation();
+                operation = curToken.operation;
                 right = SimpleExpression();
+                generator.GenerateMSIL(operation);
                 if (right != null && left != null && left.IsDerivedTo(right))
                     return new CBooleanType();
                 else
@@ -362,6 +374,7 @@ namespace MyCompilerWPF_Framework_
                 AdditiveOperation();
                 operation = curToken.operation;
                 right = Term();
+                generator.GenerateMSIL(operation);
                 if (right != null && left != null && left.IsDerivedTo(right))
                     left = CType.DeriveTo(left, operation, right);
                 if (right == null || left == null)
@@ -424,6 +437,7 @@ namespace MyCompilerWPF_Framework_
             {
                 operation = curToken.operation;
                 right = Factor();
+                generator.GenerateMSIL(operation);
                 if (right != null && left != null && left.IsDerivedTo(right))
                     left = CType.DeriveTo(left, operation, right);
                 if (right == null || left == null)
@@ -461,11 +475,16 @@ namespace MyCompilerWPF_Framework_
             CType right = null;
             GetNextTokenManualy();
             if (curToken.tokenType == ETokenType.ttIdent)
-            { return Variable(); }
+            {
+                GetNextTokenManualy();
+                generator.GenerateMSIL(curToken);
+                return Variable();
+            }
             if (curToken.tokenType == ETokenType.ttValue)
             { 
                 Accept(ETokenType.ttValue);
                 //MessageBox.Show(curToken.GetTokenContent());
+                generator.GenerateMSIL(curToken);
                 switch (curToken.valType)
                 {
                     case EType.et_integer:
@@ -484,6 +503,7 @@ namespace MyCompilerWPF_Framework_
             {
                 Accept(new CToken(EOperator.notsy));
                 right = Factor();
+                generator.GenerateMSIL(EOperator.notsy);
                 if (right != null && right.myType == EType.et_boolean)
                     return new CBooleanType();
                 else
@@ -508,30 +528,39 @@ namespace MyCompilerWPF_Framework_
             Accept(new CToken(EOperator.ifsy));
             CType exprType;
             exprType = Expression();
+            generator.GenerateMSILIfStart();
             if (exprType != null && exprType.myType != EType.et_boolean) 
                 ioModule.error("Expression must return a boolean value!");
             Accept(new CToken(EOperator.thensy));
             Operator();
+            generator.GenerateMSILIfFalse();
             GetNextTokenManualy();
             if (curToken.operation == EOperator.elsesy)
             { Accept(new CToken(EOperator.elsesy)); Operator(); }
+            generator.GenerateMSILIfEnd();
         }
         private void PreconditionLoop()// <цикл с предусловием>
         {            
             Accept(new CToken(EOperator.whilesy));
             CType exprType;
-            exprType = Expression();
+            generator.GenerateMSILWhileStart();
+            exprType = Expression();            
             if (exprType != null && exprType.myType != EType.et_boolean)
                 ioModule.error("Expression must return a boolean value!");
-            Accept(new CToken(EOperator.dosy));            
+            Accept(new CToken(EOperator.dosy));
+            generator.GenerateMSILWhileCondition();
             Operator();
+            generator.GenerateMSILWhileEnd();
         }
         private void WriteLn() // <оператор вывода>
         {
+            CToken tempToken;
             Accept(new CToken(EOperator.writelnsy));
             Accept(new CToken(EOperator.leftparsy));
             Variable();
+            tempToken = curToken;
             Accept(new CToken(EOperator.rightparsy));
+            generator.GenerateMSILWriteLn(tempToken);
         }
     }
 }
